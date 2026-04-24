@@ -1,46 +1,47 @@
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class MovePlayercat : MonoBehaviour
 {
-     public float moveSpeed;
-        
+     [SerializeField] private float _moveSpeed;
+     [SerializeField] private float _jumpForce;
+    
+     [SerializeField] private Vector2 _boxSize;
+     [SerializeField] private float _castDistance;
+     [SerializeField] private LayerMask _layerMask;
+     
+     private Rigidbody2D _rb;
+
+     void Start()
+     {
+         _rb = GetComponent<Rigidbody2D>();
+     }
            
-       
-           public bool isJumping;
-           public float jumpForce;
-       
-           private Vector2 _velocity = Vector3.zero;
-           private Rigidbody2D _rb;
+     void Update()
+     {
+         if (Input.GetButtonDown("Jump"))
+         { 
+             if(GroundCheck())
+             {
+                 _rb.AddForce(new Vector2(0f, _jumpForce), ForceMode2D.Impulse);
+             }
+         } 
+         
+         float horizontalMovement = Input.GetAxis("Horizontal");
+         _rb.linearVelocity =   new Vector2(horizontalMovement * _moveSpeed * Time.deltaTime, _rb.linearVelocity.y);
+               
+     }
 
-           void Start()
-           {
-               _rb = GetComponent<Rigidbody2D>();
-           }
-           
-           void Update()
-           {
-               float horizontalMovement = Input.GetAxis("Horizontal")*moveSpeed*Time.deltaTime;
-       
-               if (Input.GetButtonDown("Jump"))
-               {
-                   isJumping = true;
-               } 
-       
-       
-               MovePlayer(horizontalMovement);
-       
-           }
+     private bool GroundCheck()
+     {
 
-           void MovePlayer(float horizontalMovement)
-           {
-               Vector2 targetVelocity = new Vector2(horizontalMovement, _rb.linearVelocity.y);
+         return Physics2D.BoxCast(transform.position, _boxSize, 0, Vector2.down, _castDistance, _layerMask);
 
-               _rb.linearVelocity =  targetVelocity;
+     }
 
-               if (isJumping)
-               {
-                   _rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
-                   isJumping = false;
-               }
-           }
+     private void OnDrawGizmos()
+     {
+         Gizmos.color = Color.darkOrchid;
+         Gizmos.DrawWireCube(transform.position + new Vector3(0,-_castDistance),_boxSize );
+     }
 }
