@@ -10,14 +10,14 @@ public class MovePlayercat : MonoBehaviour
            public float jumpForce;
        
            private Vector2 _velocity = Vector3.zero;
-           private Rigidbody _rb;
+           private Rigidbody2D _rb;
 
            void Start()
            {
-               _rb = GetComponent<Rigidbody>();
+               _rb = GetComponent<Rigidbody2D>();
            }
            
-           void FixedUpdate()
+           void Update()
            {
                float horizontalMovement = Input.GetAxis("Horizontal")*moveSpeed*Time.deltaTime;
        
@@ -33,13 +33,13 @@ public class MovePlayercat : MonoBehaviour
 
            void MovePlayer(float horizontalMovement)
            {
-               Vector2 targetVelocity = new Vector2(-horizontalMovement, _rb.linearVelocity.y);
+               Vector2 targetVelocity = new Vector2(horizontalMovement, _rb.linearVelocity.y);
 
-               _rb.linearVelocity = Vector2.SmoothDamp(_rb.linearVelocity, targetVelocity, ref _velocity, .05f);
+               _rb.linearVelocity =  targetVelocity;
 
                if (isJumping)
                {
-                   _rb.AddForce(new Vector2(0f, jumpForce));
+                   _rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
                    isJumping = false;
                }
            }
